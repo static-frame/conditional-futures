@@ -23,8 +23,6 @@ from running truly concurrently on multiple threads.
 
 ConditionalThreadPoolExecutor detects when threads will be ineffective and avoids spawning them. That means your code remains correct and fast on both GIL and no-GIL Python builds.
 
----
-
 ### Example
 
 ```python
