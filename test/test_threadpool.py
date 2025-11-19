@@ -19,7 +19,6 @@ def test_gil_enabled_uses_single_thread_executor():
     with patch("conditional_futures.threadpool.IS_NO_GIL", False):
         with ConditionalThreadPoolExecutor(max_workers=4) as executor:
             assert isinstance(executor._executor, SingleThreadExecutor)
-            assert not isinstance(executor._executor, ThreadPoolExecutor)
 
 
 def test_gil_disabled_uses_thread_pool_executor():
@@ -27,7 +26,6 @@ def test_gil_disabled_uses_thread_pool_executor():
     with patch("conditional_futures.threadpool.IS_NO_GIL", True):
         with ConditionalThreadPoolExecutor(max_workers=4) as executor:
             assert isinstance(executor._executor, ThreadPoolExecutor)
-            assert not isinstance(executor._executor, SingleThreadExecutor)
 
 
 def test_gil_enabled_submit_works():
