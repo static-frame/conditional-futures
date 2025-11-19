@@ -1,22 +1,31 @@
-from __future__ import annotations
 from concurrent.futures import Executor, ThreadPoolExecutor, Future
-from typing import Callable, Iterable, Iterator, Optional, Any, TypeVar
+from typing import Callable, Iterable, Iterator, Optional, TypeVar
 import sys
 
 
+TVArgs = TypeVar("TVArgs")
+TVReturn = TypeVar("TVReturn")
+
+
 def is_no_gil() -> bool:
-    if hasattr(sys, '_is_gil_enabled'):
-        return not sys._is_gil_enabled()
+    if f := getattr(sys, "_is_gil_enabled", None):
+        return not f()
     return False
 
 
-T = TypeVar("T")
-R = TypeVar("R")
+IS_NO_GIL = is_no_gil()
 
 
-class _DirectExecutor(Executor):
+class SingleThreadExecutor(Executor):
     """Executor that executes tasks synchronously in the calling thread."""
-    def submit(self, fn: Callable[..., R], /, *args, **kwargs) -> Future:
+
+    def submit(
+        self,
+        fn: Callable[..., TVReturn],
+        /,
+        *args,
+        **kwargs,
+    ) -> Future:
         fut: Future = Future()
         try:
             fut.set_result(fn(*args, **kwargs))
@@ -26,48 +35,81 @@ class _DirectExecutor(Executor):
 
     def map(
         self,
-        fn: Callable[[T], R],
-        *iterables: Iterable[T],
+        fn: Callable[[TVArgs], TVReturn],
+        *iterables: Iterable[TVArgs],
         timeout: Optional[float] = None,
         chunksize: int = 1,
-    ) -> Iterator[R]:
+        buffersize: int | None = None,
+    ) -> Iterator[TVReturn]:
         return map(fn, *iterables)
 
-    def shutdown(self, wait: bool = True, *, cancel_futures: bool = False) -> None:
+    def shutdown(
+        self,
+        wait: bool = True,
+        *,
+        cancel_futures: bool = False,
+    ) -> None:
         pass
 
 
 class ConditionalThreadPoolExecutor(Executor):
     """
-    Drop-in replacement for ThreadPoolExecutor that uses threads only when
-    the runtime permits (e.g., no GIL, or other safe conditions).
+    Drop-in replacement for ThreadPoolExecutor
     """
-    def __init__(self, max_workers: Optional[int] = None, **kwargs):
+
+    def __init__(
+        self,
+        max_workers: Optional[int] = None,
+        **kwargs,
+    ):
         self._max_workers = max_workers
         self._kwargs = kwargs
-        self._executor: Executor | None = None
+        self._executor: Executor
 
     def __enter__(self):
-        if is_no_gil():
-            self._executor = ThreadPoolExecutor(max_workers=self._max_workers, **self._kwargs)
-        else:
-            self._executor = _DirectExecutor()
+        self._executor = (
+            ThreadPoolExecutor(max_workers=self._max_workers, **self._kwargs)
+            if IS_NO_GIL
+            else SingleThreadExecutor()
+        )
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self.shutdown()
-
-    def submit(self, fn: Callable[..., R], /, *args, **kwargs) -> Future:
-        return self._executor.submit(fn, *args, **kwargs)
+    def submit(
+        self,
+        fn: Callable[..., TVReturn],
+        /,
+        *args,
+        **kwargs,
+    ) -> Future:
+        return self._executor.submit(
+            fn,
+            *args,
+            **kwargs,
+        )
 
     def map(
         self,
-        fn: Callable[[T], R],
-        *iterables: Iterable[T],
+        fn: Callable[[TVArgs], TVReturn],
+        *iterables: Iterable[TVArgs],
         timeout: Optional[float] = None,
         chunksize: int = 1,
-    ) -> Iterator[R]:
-        return self._executor.map(fn, *iterables, timeout=timeout, chunksize=chunksize)
+        buffersize: int | None = None,
+    ) -> Iterator[TVReturn]:
+        return self._executor.map(
+            fn,
+            *iterables,
+            timeout=timeout,
+            chunksize=chunksize,
+            buffersize=buffersize,
+        )
 
-    def shutdown(self, wait: bool = True, *, cancel_futures: bool = False) -> None:
-        self._executor.shutdown(wait=wait, cancel_futures=cancel_futures)
+    def shutdown(
+        self,
+        wait: bool = True,
+        *,
+        cancel_futures: bool = False,
+    ) -> None:
+        self._executor.shutdown(
+            wait,
+            cancel_futures=cancel_futures,
+        )
