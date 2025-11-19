@@ -13,6 +13,7 @@ def is_no_gil() -> bool:
 
 
 IS_NO_GIL = is_no_gil()
+IS_PY_GTE314 = sys.version_info >= (3, 14)
 
 
 class SingleThreadExecutor(Executor):
@@ -94,13 +95,14 @@ class ConditionalThreadPoolExecutor(Executor):
         chunksize: int = 1,
         buffersize: int | None = None,
     ) -> Iterator[TVReturn]:
-        return self._executor.map(
-            fn,
-            *iterables,
-            timeout=timeout,
-            chunksize=chunksize,
-            buffersize=buffersize,
-        )
+        # buffersize is only supported in Python 3.14+
+        kwargs: dict[str, Any] = {
+            'timeout': timeout,
+            'chunksize': chunksize,
+        }
+        if IS_PY_GTE314 and buffersize is not None:
+            kwargs['buffersize'] = buffersize
+        return self._executor.map(fn, *iterables, **kwargs)
 
     def shutdown(
         self,
