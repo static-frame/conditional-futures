@@ -7,7 +7,7 @@ name = "conditional-futures"
 version = "0.1.0"
 description = "Make multi-threaded concurrency backward- and forward-compatible for the free-threaded future of Python."
 readme = "README.md"
-license = { text = "MIT" }
+license = "MIT"
 requires-python = ">=3.10"
 authors = [
     { name = "Christopher Ariza" }
@@ -21,7 +21,6 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
-    "License :: OSI Approved :: MIT License",
     "Intended Audience :: Developers",
     "Topic :: Software Development :: Libraries",
     "Topic :: System :: Distributed Computing",
@@ -34,6 +33,7 @@ dev = [
     "ruff==0.14.5",
     "pytest==9.0.1",
     "nox==2025.11.12",
+    "build",
 ]
 
 [project.urls]

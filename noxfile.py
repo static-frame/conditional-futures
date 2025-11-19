@@ -127,8 +127,15 @@ def build(session):
     do_clean(session)
     session.run(
         sys.executable,
-        'setup.py',
-        'sdist',
-        'bdist_wheel',
+        '-m',
+        'pip',
+        'install',
+        'build',
+        external=True,
+    )
+    session.run(
+        sys.executable,
+        '-m',
+        'build',
         external=True,
     )
