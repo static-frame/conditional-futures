@@ -1,6 +1,6 @@
 import sys
 from concurrent.futures import Executor, Future, ThreadPoolExecutor
-from typing import Callable, Iterable, Iterator, Optional, TypeVar
+from typing import Any, Callable, Iterable, Iterator, Optional, TypeVar
 
 TVArgs = TypeVar('TVArgs')
 TVReturn = TypeVar('TVReturn')
@@ -22,10 +22,10 @@ class SingleThreadExecutor(Executor):
         self,
         fn: Callable[..., TVReturn],
         /,
-        *args,
-        **kwargs,
-    ) -> Future:
-        fut: Future = Future()
+        *args: Any,
+        **kwargs: Any,
+    ) -> Future[TVReturn]:
+        fut: Future[TVReturn] = Future()
         try:
             fut.set_result(fn(*args, **kwargs))
         except Exception as e:
@@ -59,13 +59,13 @@ class ConditionalThreadPoolExecutor(Executor):
     def __init__(
         self,
         max_workers: Optional[int] = None,
-        **kwargs,
-    ):
+        **kwargs: Any,
+    ) -> None:
         self._max_workers = max_workers
         self._kwargs = kwargs
         self._executor: Executor
 
-    def __enter__(self):
+    def __enter__(self) -> 'ConditionalThreadPoolExecutor':
         self._executor = (
             ThreadPoolExecutor(max_workers=self._max_workers, **self._kwargs)
             if IS_NO_GIL
@@ -77,9 +77,9 @@ class ConditionalThreadPoolExecutor(Executor):
         self,
         fn: Callable[..., TVReturn],
         /,
-        *args,
-        **kwargs,
-    ) -> Future:
+        *args: Any,
+        **kwargs: Any,
+    ) -> Future[TVReturn]:
         return self._executor.submit(
             fn,
             *args,
