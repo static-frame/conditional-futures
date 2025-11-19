@@ -1,7 +1,6 @@
-from concurrent.futures import Executor, ThreadPoolExecutor, Future
-from typing import Callable, Iterable, Iterator, Optional, TypeVar
 import sys
-
+from concurrent.futures import Executor, Future, ThreadPoolExecutor
+from typing import Callable, Iterable, Iterator, Optional, TypeVar
 
 TVArgs = TypeVar("TVArgs")
 TVReturn = TypeVar("TVReturn")
