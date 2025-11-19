@@ -1,6 +1,6 @@
 # conditional-futures
 
-**Make thread-usage forward-compatible.**
+**Make multi-threaded concurrency forward-compatible for the free-threaded future of Python.**
 
 
 ---
