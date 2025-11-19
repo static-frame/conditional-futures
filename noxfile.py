@@ -1,41 +1,38 @@
-import argparse
-import os
 import sys
-import typing as tp
 
 import nox
 
 ARTIFACTS = (
-    "coverage.xml",
-    "htmlcov",
-    "doc/build",
-    "build",
-    "dist",
-    "*.egg-info",
-    ".coverage",
-    ".mypy_cache",
-    ".pytest_cache",
-    ".hypothesis",
-    ".ipynb_checkpoints",
-    ".ruff_cache",
+    'coverage.xml',
+    'htmlcov',
+    'doc/build',
+    'build',
+    'dist',
+    '*.egg-info',
+    '.coverage',
+    '.mypy_cache',
+    '.pytest_cache',
+    '.hypothesis',
+    '.ipynb_checkpoints',
+    '.ruff_cache',
 )
 
 # Make `nox` default to running tests if you just do `nox`
-nox.options.sessions = ["test"]
+nox.options.sessions = ['test']
 
 
 def do_clean(session: nox.Session) -> None:
     for artifact in sorted(ARTIFACTS):
-        session.run("rm", "-rf", artifact, external=True)
+        session.run('rm', '-rf', artifact, external=True)
 
 
 def do_performance(session: nox.Session) -> None:
     # keep -v to see warnings; no build isolation to match your invoke cmd
     session.run(
         sys.executable,
-        "static_frame/performance/main.py",
-        "--performance",
-        "*",
+        'static_frame/performance/main.py',
+        '--performance',
+        '*',
         external=True,
     )
 
@@ -45,47 +42,47 @@ def do_performance(session: nox.Session) -> None:
 # To show warnings:
 # nox -s test --warnings
 def do_test(session: nox.Session) -> None:
-    warnings = "--warnings" in session.posargs
+    warnings = '--warnings' in session.posargs
 
     fps = []
-    fps.append("test")
-    w_flag = "--disable-pytest-warnings"
-    cmd = f"pytest -s --tb=native {w_flag if warnings else ''} {' '.join(fps)}"
+    fps.append('test')
+    w_flag = '--disable-pytest-warnings'
+    cmd = f'pytest -s --tb=native {w_flag if warnings else ""} {" ".join(fps)}'
 
     session.run(
-        *cmd.split(" "),
+        *cmd.split(' '),
         external=True,
     )
 
 
 def do_lint(session: nox.Session) -> None:
     session.run(
-        "ruff",
-        "check",
+        'ruff',
+        'check',
         external=True,
     )
 
 
 def do_mypy(session: nox.Session) -> None:
     session.run(
-        "mypy",
-        "--strict",
+        'mypy',
+        '--strict',
         external=True,
     )
 
 
 def do_format(session: nox.Session) -> None:
-    for cmd in ("ruff check --select I --fix", "ruff format"):
+    for cmd in ('ruff check --select I --fix', 'ruff format'):
         session.run(
-            *cmd.split(" "),
+            *cmd.split(' '),
             external=True,
         )
 
 
 def do_format_check(session: nox.Session) -> None:
-    for cmd in ("ruff check --select I", "ruff format --check"):
+    for cmd in ('ruff check --select I', 'ruff format --check'):
         session.run(
-            *cmd.split(" "),
+            *cmd.split(' '),
             external=True,
         )
 
@@ -123,7 +120,6 @@ def quality(session):
     do_lint(session)
     do_format_check(session)
     do_mypy(session)
-    do_pyright(session)
 
 
 @nox.session(python=False)  # use current environment
@@ -131,8 +127,8 @@ def build(session):
     do_clean(session)
     session.run(
         sys.executable,
-        "setup.py",
-        "sdist",
-        "bdist_wheel",
+        'setup.py',
+        'sdist',
+        'bdist_wheel',
         external=True,
     )

@@ -2,12 +2,12 @@ import sys
 from concurrent.futures import Executor, Future, ThreadPoolExecutor
 from typing import Callable, Iterable, Iterator, Optional, TypeVar
 
-TVArgs = TypeVar("TVArgs")
-TVReturn = TypeVar("TVReturn")
+TVArgs = TypeVar('TVArgs')
+TVReturn = TypeVar('TVReturn')
 
 
 def is_no_gil() -> bool:
-    if f := getattr(sys, "_is_gil_enabled", None):
+    if f := getattr(sys, '_is_gil_enabled', None):
         return not f()
     return False
 
