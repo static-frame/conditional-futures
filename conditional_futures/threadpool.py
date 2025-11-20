@@ -9,8 +9,7 @@ TVReturn = TypeVar('TVReturn')
 
 
 def is_no_gil() -> bool:
-    '''Determine if the GIL is disabled. Note that this cannot be cached as the GIL can be re-enabled if a non-compatible extension is loaded.
-    '''
+    """Determine if the GIL is disabled. Note that this cannot be cached as the GIL can be re-enabled if a non-compatible extension is loaded."""
     if f := getattr(sys, '_is_gil_enabled', None):
         return not f()
     return False
