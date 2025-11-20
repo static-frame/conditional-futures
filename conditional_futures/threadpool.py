@@ -2,18 +2,18 @@ import sys
 from concurrent.futures import Executor, Future, ThreadPoolExecutor
 from typing import Any, Callable, Iterable, Iterator, Optional, TypeVar
 
+IS_PY_GTE314 = sys.version_info >= (3, 14)
+
 TVArgs = TypeVar('TVArgs')
 TVReturn = TypeVar('TVReturn')
 
 
 def is_no_gil() -> bool:
+    '''Determine if the GIL is disabled. Note that this cannot be cached as the GIL can be re-enabled if a non-compatible extension is loaded.
+    '''
     if f := getattr(sys, '_is_gil_enabled', None):
         return not f()
     return False
-
-
-IS_NO_GIL = is_no_gil()
-IS_PY_GTE314 = sys.version_info >= (3, 14)
 
 
 class SingleThreadExecutor(Executor):
@@ -69,7 +69,7 @@ class ConditionalThreadPoolExecutor(Executor):
     def __enter__(self) -> 'ConditionalThreadPoolExecutor':
         self._executor = (
             ThreadPoolExecutor(max_workers=self._max_workers, **self._kwargs)
-            if IS_NO_GIL
+            if is_no_gil()
             else SingleThreadExecutor()
         )
         return self
