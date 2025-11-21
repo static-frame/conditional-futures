@@ -3,8 +3,6 @@
 Make multi-threaded concurrency backward- and forward-compatible for the free-threaded future of Python.
 
 
----
-
 ### Introduction
 
 The new free-threaded version of Python (with the [GIL](https://docs.python.org/3/glossary.html#term-global-interpreter-lock) disabled) offers extraordinary improvement in performance of CPU-bound processes. Upgrading your code to take advantage of this performance, however, is problematic. The same multi-threaded code, if run with the GIL enabled, can actually perform significantly worse than single-threaded execution. Worse, even when using a free-threaded interpreter, importing an incompatible C-extension will automatically re-enable the GIL.
@@ -45,7 +43,31 @@ CPU times: user 1.31 s, sys: 98 ms, total: 1.41 s
 Wall time: 352 ms
 ```
 
-Now, if using the standard Python 3.14 interpreter (with the GIL enabled), we can see detrimental performance using when using the standard `ThreadPoolExecutor`.
+Now, if using the standard Python 3.14 interpreter (with the GIL enabled), we can see detrimental performance using when using the standard `ThreadPoolExecutor`: the same operation takes six times as long!
+
+```python
+$ python3.14
+>>> from concurrent.futures import ThreadPoolExecutor
+>>> array = np.arange(100_000_000).reshape(100_000, 1_000)
+>>> func = lambda row: (row[row % 2 == 0] ** 2).sum()
+>>> with ThreadPoolExecutor(max_workers=4) as ex:
+...     %time _ = np.fromiter(ex.map(func, array), dtype=float, count=array.shape[0])
+...
+CPU times: user 1.9 s, sys: 2.21 s, total: 4.12 s
+Wall time: 2.33 s
+```
+
+Using `ConditionalThreadPoolExecutor` we can have one implementation that performs optimally in both contexts. Running the same code with the GIL enabled, `ConditionalThreadPoolExecutor` does not perform as well as in `python3.14t` but provides the best option available, single-threaded performance.
+
+
+```python
+>>> from conditional_futures import ConditionalThreadPoolExecutor
+>>> with ConditionalThreadPoolExecutor(max_workers=4) as ex:
+...     %time _ = np.fromiter(ex.map(func, array), dtype=float, count=array.shape[0])
+...
+CPU times: user 532 ms, sys: 773 μs, total: 533 ms
+Wall time: 533 ms
+```
 
 
 ### Installation
