@@ -12,7 +12,7 @@ if __name__ == '__main__':
     performance_dir = Path(__file__).parent
 
     # Find all test_*.py modules in the directory
-    test_modules = sorted(performance_dir.glob('test_*.py'))
+    test_modules = sorted(performance_dir.glob('perf_*.py'))
 
     # Run each test module with each executable
     for test_module in test_modules:
