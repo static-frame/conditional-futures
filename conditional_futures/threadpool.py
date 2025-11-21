@@ -58,16 +58,25 @@ class ConditionalThreadPoolExecutor(Executor):
 
     def __init__(
         self,
-        max_workers: Optional[int] = None,
-        **kwargs: Any,
+        max_workers: int | None = None,
+        thread_name_prefix: str = '',
+        initializer: Callable[..., object] | None = None,
+        initargs: tuple[Any, ...] = (),
     ) -> None:
         self._max_workers = max_workers
-        self._kwargs = kwargs
+        self._thread_name_prefix = thread_name_prefix
+        self._initializer = initializer
+        self._initargs = initargs
         self._executor: Executor
 
     def __enter__(self) -> 'ConditionalThreadPoolExecutor':
         self._executor = (
-            ThreadPoolExecutor(max_workers=self._max_workers, **self._kwargs)
+            ThreadPoolExecutor(
+                max_workers=self._max_workers,
+                thread_name_prefix=self._thread_name_prefix,
+                initializer=self._initializer,
+                initargs=self._initargs,
+            )
             if is_no_gil()
             else SingleThreadExecutor()
         )
