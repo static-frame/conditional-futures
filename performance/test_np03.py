@@ -2,7 +2,7 @@ import numpy as np
 from np_common import main
 
 NUMBER = 2
-MAX_WORKERS = 8
+MAX_WORKERS = 8 # more workers helps here
 
 array = np.arange(100_000_000).reshape(100_000, 1_000)
 
