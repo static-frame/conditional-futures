@@ -16,9 +16,11 @@ if __name__ == '__main__':
 
     # Run each test module with each executable
     for test_module in test_modules:
+        print(f'{test_module.name}')
+
         for bin_path in BINS:
             is_ft = '314t' in str(bin_path)
-            print(f'{test_module.name}: {bin_path.name}{"t" if is_ft else ""}')
+            print(f'    {bin_path.name}{"t" if is_ft else ""}')
 
             try:
                 result = subprocess.run(
