@@ -2,6 +2,14 @@
 
 Make multi-threaded concurrency backward- and forward-compatible for the free-threaded future of Python.
 
+|Interpreter |Threading                     |Duration|
+|------------|------------------------------|--------|
+|python3.14t |None                          |0.577   |
+|python3.14t |ThreadPoolExecutor            |0.34    |
+|python3.14t |ConditionalThreadPoolExecutor |0.339   |
+|python3.14  |None                          |0.544   |
+|python3.14  |ThreadPoolExecutor            |2.231   |
+|python3.14  |ConditionalThreadPoolExecutor |0.532   |
 
 ### Introduction
 
