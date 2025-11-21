@@ -1,7 +1,7 @@
 import numpy as np
 from np_common import main
 
-NUMBER = 1
+NUMBER = 2
 MAX_WORKERS = 8
 
 array = np.arange(100_000_000).reshape(100_000, 1_000)
