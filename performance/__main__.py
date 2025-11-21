@@ -36,10 +36,6 @@ if __name__ == '__main__':
                 print(f'Error running {test_module.name} with {bin_path.name}: {e}')
 
 
-
-
-
-
 # linux performance
 # test_np01.py
 #     python3.14
