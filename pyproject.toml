@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "conditional-futures"
-version = "0.1.0"
+version = "1.0.0"
 description = "Make multi-threaded concurrency backward- and forward-compatible for the free-threaded future of Python."
 readme = "README.md"
 license = "MIT"
