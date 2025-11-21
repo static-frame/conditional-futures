@@ -2,14 +2,27 @@
 
 Make multi-threaded concurrency backward- and forward-compatible for the free-threaded future of Python.
 
-|Interpreter |Threading                     |Duration|
+
+### Multi-Threading In and Out of Free-Threading
+
+The following is a table of performance results for the execution of a function across each row of NumPy array, with `python3.14t` and `python3.14`, and with and without using a `ThreadPoolExecutor`. Performance improves with `python3.14t` but degrades with `python3.14`.
+
+|Interpreter |Executor                      |Duration|
 |------------|------------------------------|--------|
-|python3.14t |None                          |0.577   |
-|python3.14t |ThreadPoolExecutor            |0.34    |
-|python3.14t |ConditionalThreadPoolExecutor |0.339   |
-|python3.14  |None                          |0.544   |
-|python3.14  |ThreadPoolExecutor            |2.231   |
-|python3.14  |ConditionalThreadPoolExecutor |0.532   |
+|python3.14t |None                          |🟡 0.577 |
+|python3.14t |ThreadPoolExecutor            |🟢 0.34  |
+|python3.14  |None                          |🟡 0.544 |
+|python3.14  |ThreadPoolExecutor            |🔴 2.231 |
+
+`ConditionalThreadPoolExecutor` lets a single interface get the best result in both contexts.
+
+|Interpreter |Executor                      |Duration|
+|------------|------------------------------|--------|
+|python3.14t |None                          |🟡 0.577 |
+|python3.14t |ConditionalThreadPoolExecutor |🟢 0.339 |
+|python3.14  |None                          |🟡 0.544 |
+|python3.14  |ConditionalThreadPoolExecutor |🟡 0.532 |
+
 
 ### Introduction
 
