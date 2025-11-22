@@ -96,6 +96,11 @@ pip install conditional-futures
 
 ## What is New in `conditional-futures`
 
+### 1.0.2
+
+Extended documentation.
+
+
 ### 1.0.1
 
 Extended documentation.
